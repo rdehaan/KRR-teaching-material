@@ -1,0 +1,16 @@
+c This is an example CNF formula that nicely shows the difference
+c in behavior between a DPLL and a CDCL solver,
+c when using the ORDERED decision heuristic.
+c
+c It has 8 variables and 9 clauses.
+c
+p cnf 8 9
+-3 -4 -5 6 0
+-1 -6 7 0
+-6 -8 0
+-1 -7 8 0
+-1 -3 6 0
+-1 -4 6 0
+-1 -5 6 0
+-1 3 4 5 6 -7 0
+-1 -2 3 4 5 6 7 0
