@@ -252,6 +252,14 @@ class DPLLSolver:
                 if self._verbose:
                     print("* UP: ".ljust(15), end="")
                     print(node)
+
+                    current_assignment = []
+                    for node in self._assignment_stack.copy():
+                        if node.value:
+                            current_assignment.append(node.var)
+                        else:
+                            current_assignment.append(-1*node.var)
+                    print(f"\x1b[37m  Current assignment: {current_assignment}\x1b[0m")
             else:
                 node = self._variable_to_assignment_nodes[var]
                 if node.value != value_to_set:
@@ -484,6 +492,14 @@ class DPLLSolver:
                         if self._verbose:
                             print("* UP: ".ljust(15), end="")
                             print(assign_var_node)
+
+                            current_assignment = []
+                            for node in self._assignment_stack.copy():
+                                if node.value:
+                                    current_assignment.append(node.var)
+                                else:
+                                    current_assignment.append(-1*node.var)
+                            print(f"\x1b[37m  Current assignment: {current_assignment}\x1b[0m")
                     else:
 
                         conflict_node = AssignedNode(
@@ -696,6 +712,14 @@ class DPLLSolver:
                     conflict_level_var
                 print("* UP: ".ljust(15), end="")
                 print(node)
+
+                current_assignment = []
+                for node in self._assignment_stack.copy():
+                    if node.value:
+                        current_assignment.append(node.var)
+                    else:
+                        current_assignment.append(-1*node.var)
+                print(f"\x1b[37m  Current assignment: {current_assignment}\x1b[0m")
 
             return backtrack_level, node
 
