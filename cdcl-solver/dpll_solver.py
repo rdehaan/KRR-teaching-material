@@ -583,6 +583,8 @@ class DPLLSolver:
         backtrack_node = None
         while True:
             assigment_stack_pointer -= 1
+            if assigment_stack_pointer < 0:
+                break
             node = self._assignment_stack[assigment_stack_pointer]
             if node.level == conflict_level:
                 backtrack_node = node
