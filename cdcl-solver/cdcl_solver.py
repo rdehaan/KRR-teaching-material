@@ -294,6 +294,7 @@ class CDCLSolver:
             else:
                 node = self._variable_to_assignment_nodes[var]
                 if node.value != value_to_set:
+                    print("\x1b[91mUNSAT\x1b[0m")
                     self.stats._result = "UNSAT"
                     return 0
 
