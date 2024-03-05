@@ -186,6 +186,86 @@ def print_answer_sets(
         print()
 
 
+def models(
+    program,
+    num_models=0,
+):
+    """
+    Iterate over the supported models of a program,
+    in the form of lists of atoms.
+    """
+    # pylint: disable=no-member
+
+    reified_symbols = reify_program(
+        program,
+        calculate_sccs=False,
+    )
+    reified_program = "".join([
+        f"{symbol}.\n"
+        for symbol in reified_symbols
+    ])
+
+    meta_program = """
+        conjunction(B) :- literal_tuple(B),
+            not not hold(L) : literal_tuple(B, L), L > 0;
+                not hold(L) : literal_tuple(B,-L), L > 0.
+
+        body(normal(B)) :- rule(_,normal(B)), conjunction(B).
+        body(sum(B,G))  :- rule(_,sum(B,G)),
+            #sum { W,L : not not hold(L), weighted_literal_tuple(B, L,W), L > 0 ;
+                   W,L :     not hold(L), weighted_literal_tuple(B,-L,W), L > 0 } >= G.
+
+          hold(A) : atom_tuple(H,A)   :- rule(disjunction(H),B), body(B).
+        { hold(A) : atom_tuple(H,A) } :- rule(     choice(H),B), body(B).
+
+        atom( A ) :- atom_tuple(_,A).
+        atom(|L|) :-          literal_tuple(_,L).
+        atom(|L|) :- weighted_literal_tuple(_,L).
+
+        { hold(A) : atom(A) }.
+
+        #show.
+        #show model(T) : output(T,B), conjunction(B).
+    """
+
+    # Load and ground reified program, together with meta programs
+    control = clingo.Control([
+        '--project',
+        '--warn=none',
+    ])
+    control.add("base", [], reified_program)
+    control.add("base", [], meta_program)
+    control.ground([("base", [])])
+
+    control.configuration.solve.models = num_models
+
+    with control.solve(yield_=True) as handle:
+        for answer_set in handle:
+            atoms = list(answer_set.symbols(shown=True))
+            model = [
+                str(atom.arguments[0]) for atom in atoms
+                if atom.name == "model"
+            ]
+            model.sort()
+            yield model
+
+
+def print_models(
+    program,
+    num_models=0,
+):
+    """
+    Print the supported models of a program.
+    """
+    for i, model in enumerate(models(
+        program,
+        num_models,
+    ), start=1):
+        print(f"#{i}:")
+        print(f"- Model: {{ {', '.join(model)} }}")
+        print()
+
+
 def supported_models(
     program,
     num_models=0,
